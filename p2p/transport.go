@@ -19,7 +19,7 @@ type Transport interface {
 
 	Addr()	string
 	Dial(string) error
-	ListAndAccept() error
+	ListenAndAccept() error
 	Consume() <- chan RPC
 	Close() error
 
