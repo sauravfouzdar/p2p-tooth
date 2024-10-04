@@ -79,6 +79,7 @@ func NewStore(opts StoreOpts) *Store {
 	if len(opts.Root) == 0 {
 		opts.Root = defaultRootDirectoryName
 	}
+	
 	return &Store{
 			StoreOpts: opts,
 	}

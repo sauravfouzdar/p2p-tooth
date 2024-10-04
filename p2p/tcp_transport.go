@@ -1,16 +1,15 @@
 package p2p
 
 import (
-	"net"
-	"sync"
-	"errors"
-	"fmt"
-	"log"
 
+		"net"
+		"sync"
+		"errors"
+		"fmt"
+		"log"
 )
 
 // tcpNode represents a peer node in the network
-
 type TCPNode struct {
 
 	net.Conn
@@ -44,7 +43,7 @@ type TCPTransportOpts struct {
 	ListenAddr string
 	HandshakeFunc HandshakeFunc
 	Decoder Decoder
-	OnPeer func(Peer) error
+	OnPeer func(PNode) error
 }
 
 // tcp transport
@@ -53,7 +52,6 @@ type TCPTransport struct {
 	listener net.Listener
 	rpcch chan RPC
 }
-
 
 // new connection
 func NEWTCPTransport(opts TCPTransportOpts) *TCPTransport {
@@ -78,8 +76,6 @@ func (t *TCPTransport) Close() error {
 
 // Dial implements the Transport interface
 func (t *TCPTransport) Dial(addr string) error {
-
-
 	conn, err := net.Dial("tcp", addr)
 	if err != nil {
 		return err
@@ -153,9 +149,9 @@ func (t *TCPTransport) handleConn(conn net.Conn, outbound bool) {
 		}
 		rpc.FROM = conn.RemoteAddr().String()
 		if rpc.Stream {
-			peer.wg.Add(1)
+			node.wg.Add(1)
 			fmt.Println("[%s] incoming stream waiting....\n", rpc.FROM)
-			peer.wg.Wait()
+			node.wg.Wait()
 			fmt.Println("[%s] incoming stream done, resuming read loop.. \n", rpc.FROM)
 			continue
 		}

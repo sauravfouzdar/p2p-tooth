@@ -1,6 +1,7 @@
 package crypto
 
 import (
+
 	"crypto/aes"
 	"crypto/cipher"
 	"crypto/rand"
@@ -27,7 +28,7 @@ func NewEncryptionKey () []byte {
 	return keyBuf
 }
 
-func copyStream (stream cipher.Stream, blockSize int, src io.Reader, dst io.Writer) (int, error) {
+func CopyStream (stream cipher.Stream, blockSize int, src io.Reader, dst io.Writer) (int, error) {
 	var (
 		buf = make([]byte, 32*1024)
 		nw = blockSize
@@ -52,7 +53,7 @@ func copyStream (stream cipher.Stream, blockSize int, src io.Reader, dst io.Writ
 		return nw, nil
 }
 
-func copyDecrypt (key []byte, src io.Reader, dst io.Writer) (int, error) {
+func CopyDecrypt (key []byte, src io.Reader, dst io.Writer) (int, error) {
 	block, err := aes.NewCipher(key)
 	if err != nil {
 		return 0, err
@@ -63,10 +64,10 @@ func copyDecrypt (key []byte, src io.Reader, dst io.Writer) (int, error) {
 		return 0, err
 	}
 	stream := cipher.NewCTR(block, iv)
-	return copyStream(stream, block.BlockSize(), src, dst)
+	return CopyStream(stream, block.BlockSize(), src, dst)
 }
 
-func copyEncrypt (key []byte, src io.Reader, dst io.Writer) (int, error) {
+func CopyEncrypt (key []byte, src io.Reader, dst io.Writer) (int, error) {
 	block, err := aes.NewCipher(key)
 	if err != nil {
 		return 0, err
@@ -84,5 +85,5 @@ func copyEncrypt (key []byte, src io.Reader, dst io.Writer) (int, error) {
 	// converts block cipher to stream cipher 
 	// to decrypt/encrypt data of any size
 	stream := cipher.NewCTR(block, iv) 
-	return copyStream(stream, block.BlockSize(), src, dst)
+	return CopyStream(stream, block.BlockSize(), src, dst)
 }
