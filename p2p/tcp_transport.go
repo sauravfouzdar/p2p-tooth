@@ -20,7 +20,7 @@ type TCPNode struct {
 
 }
 
-func NEWTCPNode(conn net.Conn, outbound bool) *TCPNode {
+func NewTCPNode(conn net.Conn, outbound bool) *TCPNode {
 	return &TCPNode{
 		Conn: conn,
 		outbound: outbound,
@@ -28,8 +28,10 @@ func NEWTCPNode(conn net.Conn, outbound bool) *TCPNode {
 	}
 }
 
-func (p *TCPNode) CloseStream(){
+func (p *TCPNode) CloseStream () error {
 	p.wg.Done()
+
+	return nil
 }
 
 // Send sends bytes to the peer node
@@ -43,7 +45,7 @@ type TCPTransportOpts struct {
 	ListenAddr string
 	HandshakeFunc HandshakeFunc
 	Decoder Decoder
-	OnPeer func(PNode) error
+	OnPeer func(Node) error
 }
 
 // tcp transport
@@ -56,7 +58,7 @@ type TCPTransport struct {
 // new connection
 func NEWTCPTransport(opts TCPTransportOpts) *TCPTransport {
 	return &TCPTransport{
-		opts: opts,
+		TCPTransportOpts: opts,
 		rpcch: make(chan RPC, 1024), // buffer size of 1024 messages
 	}
 }
@@ -125,7 +127,7 @@ func (t *TCPTransport) handleConn(conn net.Conn, outbound bool) {
 		conn.Close()
 	}()
 
-	node := NEWTCPNode(conn, outbound)
+	node := NewTCPNode(conn, outbound)
 	if err = t.HandshakeFunc(node); err != nil {
 		conn.Close()
 		log.Printf("Handshake failed: %s", err)
@@ -150,9 +152,9 @@ func (t *TCPTransport) handleConn(conn net.Conn, outbound bool) {
 		rpc.FROM = conn.RemoteAddr().String()
 		if rpc.Stream {
 			node.wg.Add(1)
-			fmt.Println("[%s] incoming stream waiting....\n", rpc.FROM)
+			fmt.Printf("[%s] incoming stream waiting....\n", rpc.FROM)
 			node.wg.Wait()
-			fmt.Println("[%s] incoming stream done, resuming read loop.. \n", rpc.FROM)
+			fmt.Printf("[%s] incoming stream done, resuming read loop.. \n", rpc.FROM)
 			continue
 		}
 		t.rpcch <- rpc

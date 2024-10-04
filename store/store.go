@@ -10,7 +10,7 @@ import (
 	"log"
 	"io"
 
-	"crypto"
+	"github.com/sauravfouzdar/p2p-tooth/crypto"
 )
 
 
@@ -106,7 +106,7 @@ func (s *Store) Delete(id string, key string) error {
 	return os.RemoveAll(firstPathNameWithRoot)
 }
 
-func (s *Store) Write (id, string, key string, r io.Reader) (int64, error) {
+func (s *Store) Write (id string, key string, r io.Reader) (int64, error) {
 	return s.writeStream(id, key, r)
 }
 

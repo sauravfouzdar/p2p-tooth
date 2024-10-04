@@ -7,27 +7,27 @@ import (
 	"log"
 	"time"
 
-	"crypto"
-	"p2p"
-	"store"
+	"github.com/sauravfouzdar/p2p-tooth/crypto"
+	"github.com/sauravfouzdar/p2p-tooth/p2p"
+	"github.com/sauravfouzdar/p2p-tooth/store"
 )
 
 func createServer(listenerAddr string, nodes ...string) *FileServer {
 	TCPTransportOpts := p2p.TCPTransportOpts{
 		ListenAddr:    listenerAddr,
-		HandshakeFunc: p2p.NOPHandshake,
+		HandshakeFunc: p2p.NOPHandshakeFunc,
 		Decoder:       p2p.DefaultDecoder{},
 	}
-	TCPTransport := p2p.NEWTCPTransport(TCPTransportOpts)
+	tcpTransport := p2p.NEWTCPTransport(TCPTransportOpts)
 	fileServerOpts := FileServerOpts{
 		EncKey:                  crypto.NewEncryptionKey(),
 		StorageRoot:             listenerAddr + "_network",
-		DefaulPathTransformFunc: store.CASPathTransformFunc,
-		Transport:               TCPTransport,
+		PathTransformFunc: store.CASPathTransformFunc,
+		Transport:               tcpTransport,
 		BootstrapNodes:          nodes,
 	}
 	s := NewFileServer(fileServerOpts)
-	TCPTransport.OnPeer = s.onPeer
+	tcpTransport.OnPeer = s.onPeer
 	return s
 }
 
@@ -53,6 +53,11 @@ func main() {
 
 		if err := server_2.store.Delete(server_2.ID, key); err != nil {
 			log.Fatal(err)
+		}
+
+		r, err := server_2.Get(key)
+		if err != nil {
+				log.Fatal(err)
 		}
 		b, err := io.ReadAll(r)
 		if err != nil {

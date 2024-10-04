@@ -6,7 +6,7 @@ import (
 
 
 // PNode represents a peer node in the network
-type PNode interface {
+type Node interface {
 
 	net.Conn
 	Send ([]byte) error

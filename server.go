@@ -10,9 +10,9 @@ import (
 	"sync"
 	"time"
 
-	"crypto"
-	"p2p"
-	"store"
+	"github.com/sauravfouzdar/p2p-tooth/crypto"
+	"github.com/sauravfouzdar/p2p-tooth/p2p"
+	"github.com/sauravfouzdar/p2p-tooth/store"
 )
 
 
@@ -29,7 +29,7 @@ type FileServer struct {
 		FileServerOpts
 
 		peerLock sync.Mutex 
-		peers map[string]p2p.Peer 
+		peers map[string]p2p.Node 
 		store *store.Store 
 		quitch chan struct {}
 }
@@ -46,7 +46,7 @@ func NewFileServer(opts FileServerOpts) *FileServer {
 				FileServerOpts: opts,
 				store: store.NewStore(storeOpts),
 				quitch: make(chan struct{}),
-				peers: make(map[string]p2p.Peer),
+				peers: make(map[string]p2p.Node),
 		}
 }
 
@@ -96,7 +96,7 @@ func (s *FileServer) Get (key string) (io.Reader, error) {
 		msg := Message {
 				Payload: MessageGetFile{
 						ID: s.ID,
-						key: crypto.HashKey(key),
+						Key: crypto.HashKey(key),
 				},
 		}
 
@@ -138,7 +138,7 @@ func (s *FileServer) Store (key string, r io.Reader) error {
 		msg := Message {
 				Payload: MessageStoreFile {
 					ID: s.ID,
-					key: crypto.HashKey(key),
+					Key: crypto.HashKey(key),
 					Size: size + 16,
 				},
 		}
@@ -175,7 +175,7 @@ func (s *FileServer) Delete (key string) error {
 		msg := Message {
 				Payload: MessageDeleteFile {
 						ID: s.ID,
-						key: crypto.HashKey(key),
+						Key: crypto.HashKey(key),
 				},
 		}
 		
@@ -195,7 +195,7 @@ func (s *FileServer) Stop() {
 	close (s.quitch)
 }
 
-func (s *FileServer) onPeer (p p2p.Peer) error {
+func (s *FileServer) onPeer (p p2p.Node) error {
 	s.peerLock.Lock()
 	defer s.peerLock.Unlock()
 	s.peers[p.RemoteAddr().String()] = p 
