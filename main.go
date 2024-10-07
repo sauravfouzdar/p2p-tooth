@@ -20,11 +20,11 @@ func createServer(listenerAddr string, nodes ...string) *FileServer {
 	}
 	tcpTransport := p2p.NEWTCPTransport(TCPTransportOpts)
 	fileServerOpts := FileServerOpts{
-		EncKey:                  crypto.NewEncryptionKey(),
-		StorageRoot:             listenerAddr + "_network",
+		EncKey:            crypto.NewEncryptionKey(),
+		StorageRoot:       listenerAddr + "_network",
 		PathTransformFunc: store.CASPathTransformFunc,
-		Transport:               tcpTransport,
-		BootstrapNodes:          nodes,
+		Transport:         tcpTransport,
+		BootstrapNodes:    nodes,
 	}
 	s := NewFileServer(fileServerOpts)
 	tcpTransport.OnPeer = s.onPeer
@@ -34,8 +34,8 @@ func createServer(listenerAddr string, nodes ...string) *FileServer {
 func main() {
 
 	server_1 := createServer(":3000", "")
-	server_2 := createServer(":5000", "3000")
-	server_3 := createServer(":7000", ":5000", ":3000")
+	server_2 := createServer(":4000", "3000")
+	server_3 := createServer(":5000", ":3000", ":4000")
 
 	go func() { log.Fatal(server_1.Start()) }()
 
@@ -57,12 +57,12 @@ func main() {
 
 		r, err := server_2.Get(key)
 		if err != nil {
-				log.Fatal(err)
+			log.Fatal(err)
 		}
 		b, err := io.ReadAll(r)
 		if err != nil {
 			log.Fatal(err)
 		}
-		log.Println("read bytes from the file system:", string(b))
+		log.Println("Read bytes from the file system:", string(b))
 	}
 }

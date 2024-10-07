@@ -92,9 +92,9 @@ func (s *Store) Has (id string, key string) bool {
 	return !errors.Is(err, os.ErrNotExist)
 }
 
-func (s *Store) clear() error {
-		return os.RemoveAll(s.Root)
-}
+// func (s *Store) clear() error {
+// 		return os.RemoveAll(s.Root)
+// }
 
 func (s *Store) Delete(id string, key string) error {
 	pathKey := s.PathTransformFunc(key)
@@ -147,7 +147,7 @@ func (s *Store) Read (id string, key string) (int64, io.Reader, error) {
 
 func (s *Store) readStream (id string, key string) (int64, io.ReadCloser, error){
 		pathKey := s.PathTransformFunc(key)
-		fullPathWithRoot := fmt.Sprintln("%s/%s/%s", s.Root, id, pathKey.fullPath())
+		fullPathWithRoot := fmt.Sprintf("%s/%s/%s", s.Root, id, pathKey.fullPath())
 
 		file, err := os.Open(fullPathWithRoot)
 		if err != nil {

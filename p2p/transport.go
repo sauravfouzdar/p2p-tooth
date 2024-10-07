@@ -5,7 +5,7 @@ import (
 )
 
 
-// PNode represents a peer node in the network
+// Node represents a peer node in the network
 type Node interface {
 
 	net.Conn

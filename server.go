@@ -271,6 +271,7 @@ func (s *FileServer) handleMessageGetFile (from string, msg MessageGetFile) erro
 
 		return nil
 }
+
 func (s *FileServer) handleMessageStoreFile (from string, msg MessageStoreFile) error {
 		peer, ok := s.peers[from]
 		if !ok {
